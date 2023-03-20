@@ -1,0 +1,130 @@
+basePath: /
+definitions:
+  controllers.BookCreate:
+    properties:
+      author:
+        type: string
+      title:
+        type: string
+    type: object
+  controllers.BooksList:
+    properties:
+      books:
+        items:
+          $ref: '#/definitions/models.Book'
+        type: array
+    type: object
+  gorm.DeletedAt:
+    properties:
+      time:
+        type: string
+      valid:
+        description: Valid is true if Time is not NULL
+        type: boolean
+    type: object
+  models.Book:
+    properties:
+      author:
+        type: string
+      createdAt:
+        type: string
+      deletedAt:
+        $ref: '#/definitions/gorm.DeletedAt'
+      id:
+        type: integer
+      title:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: info@ypsi.fr
+    name: YPSI SAS
+    url: https://www.ypsi.fr/
+  description: This is a sample server for demonstration.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /book:
+    post:
+      description: Create book in DB
+      parameters:
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.BookCreate'
+      responses:
+        "200":
+          description: Books return
+          schema:
+            $ref: '#/definitions/models.Book'
+        "400":
+          description: Error on request
+        "500":
+          description: Error to create
+      summary: Create book
+      tags:
+      - book
+  /book/{id}:
+    delete:
+      description: Delete one book in DB by ID
+      parameters:
+      - description: Book's ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Error on request
+        "404":
+          description: Error book not find
+        "500":
+          description: Error to delete
+      summary: Delete one book
+      tags:
+      - book
+  /books:
+    get:
+      description: Get all books in DB
+      responses:
+        "200":
+          description: Books return
+          schema:
+            $ref: '#/definitions/controllers.BooksList'
+        "500":
+          description: Error to find
+      summary: Get all books
+      tags:
+      - book
+  /books/author/{author}:
+    get:
+      description: Get all books in DB by author name
+      parameters:
+      - description: Author's name
+        in: path
+        name: author
+        required: true
+        type: string
+      responses:
+        "200":
+          description: Books return
+          schema:
+            $ref: '#/definitions/controllers.BooksList'
+        "400":
+          description: Error on request
+        "500":
+          description: Error to find book by author
+      summary: Get all books by author name
+      tags:
+      - book
+swagger: "2.0"

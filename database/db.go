@@ -1,13 +1,12 @@
 package database
 
 import (
-	"Golang-GORM-tutoriel/models"
+	"Golang-SWAG-tutoriel/models"
 	"fmt"
 
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
-
 
 func ConnectDb(host string) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(host), &gorm.Config{})

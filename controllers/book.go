@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"Golang-GORM-tutoriel/models"
+	"Golang-SWAG-tutoriel/models"
 	"net/http"
 	"strconv"
 
@@ -18,6 +18,16 @@ type BookCreate struct {
 	Author string `json:"author"`
 }
 
+type BooksList struct {
+	Books []models.Book `json:"books"`
+}
+
+// @Summary Get all books
+// @Description Get all books in DB
+// @Tags book
+// @Success 200 {object} controllers.BooksList "Books return"
+// @Failure 500 "Error to find"
+// @Router /books [get]
 func (repository *BookRepo) FindBooks(c *gin.Context) {
 	var bookModel models.Book
 	books, err := bookModel.GetBooks(repository.Db)
@@ -25,9 +35,17 @@ func (repository *BookRepo) FindBooks(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "Erreur récupération des livres")
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"books": books})
+	c.JSON(http.StatusOK, BooksList{Books: *books})
 }
 
+// @Summary Get all books by author name
+// @Description Get all books in DB by author name
+// @Tags book
+// @Success 200 {object} controllers.BooksList "Books return"
+// @Failure 500 "Error to find book by author"
+// @Failure 400 "Error on request"
+// @Param author path string true "Author's name"
+// @Router /books/author/{author} [get]
 func (repository *BookRepo) FindBooksByAuthor(c *gin.Context) {
 	author := c.Param("author")
 
@@ -37,13 +55,21 @@ func (repository *BookRepo) FindBooksByAuthor(c *gin.Context) {
 		c.String(http.StatusInternalServerError, "Erreur récupération des livres")
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"books": books})
+	c.JSON(http.StatusOK, BooksList{Books: *books})
 }
 
+// @Summary Create book
+// @Description Create book in DB
+// @Tags book
+// @Success 200 {object} models.Book "Books return"
+// @Failure 500 "Error to create"
+// @Failure 400 "Error on request"
+// @Param body body controllers.BookCreate true "Body"
+// @Router /book [post]
 func (repository *BookRepo) CreateBook(c *gin.Context) {
 	var bookInput BookCreate
 	if err := c.ShouldBindJSON(&bookInput); err != nil {
-		c.String(http.StatusInternalServerError, "Erreur récupération du JSON")
+		c.String(http.StatusBadRequest, "Erreur récupération du JSON")
 		return
 	}
 
@@ -58,9 +84,18 @@ func (repository *BookRepo) CreateBook(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"book": newBook})
+	c.JSON(http.StatusOK, newBook)
 }
 
+// @Summary Delete one book
+// @Description Delete one book in DB by ID
+// @Tags book
+// @Success 200
+// @Failure 500 "Error to delete"
+// @Failure 400 "Error on request"
+// @Failure 404 "Error book not find"
+// @Param id path string true "Book's ID"
+// @Router /book/{id} [delete]
 func (repository *BookRepo) DeleteBook(c *gin.Context) {
 	bookId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -81,5 +116,5 @@ func (repository *BookRepo) DeleteBook(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": true})
+	c.Status(http.StatusOK)
 }
